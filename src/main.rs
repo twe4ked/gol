@@ -20,7 +20,7 @@ const OFFSETS: [(isize, isize); 8] = [
     ( 1, -1), ( 1, 0), ( 1, 1),
 ];
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Debug)]
 struct Cell {
     alive: bool,
 }
@@ -43,7 +43,7 @@ impl std::fmt::Display for Cell {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Debug)]
 struct World {
     cells: Vec<Vec<Cell>>,
 }
@@ -99,7 +99,7 @@ impl World {
                     }
                 } else {
                     // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-                    if live_neighbours_count == 2 {
+                    if live_neighbours_count == 3 {
                         self.birth_cell(x as usize, y as usize);
                     }
                 }
@@ -202,5 +202,50 @@ mod tests {
             world.birth_cell(x as usize, y as usize);
             assert_eq!(world.live_neighbours_count(1, 1), i);
         }
+    }
+
+    #[test]
+    fn test_block() {
+        let cells = vec![
+            vec![
+                Cell::default(),
+                Cell::default(),
+                Cell::default(),
+                Cell::default(),
+            ],
+            vec![
+                Cell::default(),
+                Cell::default(),
+                Cell::default(),
+                Cell::default(),
+            ],
+            vec![
+                Cell::default(),
+                Cell::default(),
+                Cell::default(),
+                Cell::default(),
+            ],
+            vec![
+                Cell::default(),
+                Cell::default(),
+                Cell::default(),
+                Cell::default(),
+            ],
+        ];
+
+        let mut world = World { cells };
+
+        world.birth_cell(1, 1);
+        world.birth_cell(1, 2);
+        world.birth_cell(2, 1);
+        world.birth_cell(2, 2);
+        draw_world(&world);
+
+        let old_world = world.clone();
+
+        world.simulate();
+        draw_world(&world);
+
+        assert_eq!(old_world, world);
     }
 }
