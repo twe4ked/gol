@@ -13,6 +13,13 @@
 //!   #  #
 //!    # #
 
+#[rustfmt::skip]
+const OFFSETS: [(isize, isize); 8] = [
+    (-1, -1), (-1, 0), (-1, 1),
+    ( 0, -1),/* 0  0 */( 0, 1),
+    ( 1, -1), ( 1, 0), ( 1, 1),
+];
+
 #[derive(Clone)]
 struct Cell {
     alive: bool,
@@ -59,14 +66,7 @@ impl World {
         let y = y as isize;
         let mut n = 0;
 
-        #[rustfmt::skip]
-        let offsets = vec![
-            (-1, -1), (-1, 0), (-1, 1),
-            ( 0, -1),          ( 0, 1),
-            ( 1, -1), ( 1, 0), ( 1, 1),
-        ];
-
-        for (x_offset, y_offset) in offsets {
+        for (x_offset, y_offset) in &OFFSETS {
             let xx = x + x_offset;
             let yy = y + y_offset;
 
@@ -175,24 +175,24 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test() {
-        // 1 2 3
-        // 8 x 4
-        // 7 6 5
+    fn test_live_neighbours_count() {
         let cells = vec![
             vec![Cell::default(), Cell::default(), Cell::default()],
             vec![Cell::default(), Cell::default(), Cell::default()],
             vec![Cell::default(), Cell::default(), Cell::default()],
         ];
         let mut world = World { cells };
-        world.birth_cell(0, 0);
 
-        assert_eq!(world.live_neighbours_count(1, 1), 1);
+        assert_eq!(world.live_neighbours_count(1, 1), 0);
 
-        world.birth_cell(1, 0);
-        assert_eq!(world.live_neighbours_count(1, 1), 2);
+        let mut i = 0;
+        for (x_offset, y_offset) in &OFFSETS {
+            let x = 1 + *x_offset;
+            let y = 1 + *y_offset;
 
-        world.birth_cell(0, 1);
-        assert_eq!(world.live_neighbours_count(1, 1), 3);
+            i += 1;
+            world.birth_cell(x as usize, y as usize);
+            assert_eq!(world.live_neighbours_count(1, 1), i);
+        }
     }
 }
