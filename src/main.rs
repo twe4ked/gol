@@ -70,7 +70,7 @@ impl World {
             let xx = x + x_offset;
             let yy = y + y_offset;
 
-            if xx >= 0 && yy >= 0 && xx < WIDTH as isize && yy < HEIGHT as isize {
+            if xx >= 0 && yy >= 0 && xx < self.width() as isize && yy < self.height() as isize {
                 if self.is_cell_alive(xx as u8, yy as u8) {
                     n += 1
                 }
@@ -83,8 +83,8 @@ impl World {
     fn simulate(&mut self) {
         let old_world = self.clone();
 
-        for y in 0..HEIGHT {
-            for x in 0..WIDTH {
+        for y in 0..self.height() {
+            for x in 0..self.width() {
                 let live_neighbours_count = old_world.live_neighbours_count(x, y);
 
                 if old_world.is_cell_alive(x, y) {
@@ -105,6 +105,14 @@ impl World {
                 }
             }
         }
+    }
+
+    fn height(&self) -> u8 {
+        self.cells.len() as u8
+    }
+
+    fn width(&self) -> u8 {
+        self.cells[0].len() as u8
     }
 }
 
