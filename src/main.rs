@@ -20,7 +20,7 @@ const OFFSETS: [(isize, isize); 8] = [
     ( 1, -1), ( 1, 0), ( 1, 1),
 ];
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq)]
 struct Cell {
     alive: bool,
 }
@@ -43,7 +43,7 @@ impl std::fmt::Display for Cell {
     }
 }
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq)]
 struct World {
     cells: Vec<Vec<Cell>>,
 }
@@ -129,6 +129,21 @@ impl Default for World {
         }
 
         Self { cells }
+    }
+}
+
+impl std::fmt::Debug for World {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        write!(f, "\n")?;
+        for row in &self.cells {
+            for cell in row {
+                write!(f, "{}", cell)?;
+            }
+            write!(f, "\n")?;
+        }
+        write!(f, "\n")?;
+
+        Ok(())
     }
 }
 
@@ -239,12 +254,10 @@ mod tests {
         world.birth_cell(1, 2);
         world.birth_cell(2, 1);
         world.birth_cell(2, 2);
-        draw_world(&world);
 
         let old_world = world.clone();
 
         world.simulate();
-        draw_world(&world);
 
         assert_eq!(old_world, world);
     }
