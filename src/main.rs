@@ -148,11 +148,19 @@ const WIDTH: u8 = 80;
 fn main() {
     let mut world = World::default();
 
-    world.birth_cell(3, 1);
-    world.birth_cell(3, 2);
-    world.birth_cell(3, 3);
-    world.birth_cell(1, 2);
-    world.birth_cell(2, 3);
+    let seed = "- - - - -
+                - - - # -
+                - # - # -
+                - - # # -
+                - - - - -";
+
+    for (y, row) in seed.trim().split("\n").enumerate() {
+        for (x, cell) in row.trim().split(" ").enumerate() {
+            if cell == "#" {
+                world.birth_cell(x, y);
+            }
+        }
+    }
 
     let mut i = 0;
     loop {
