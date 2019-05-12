@@ -89,16 +89,11 @@ impl World {
 
                 if old_world.is_cell_alive(x, y) {
                     if live_neighbours_count < 2 {
-                        // Any live cell with fewer than two live neighbours dies, as if by underpopulation.
                         self.kill_cell(x as usize, y as usize);
-                    } else if live_neighbours_count == 2 || live_neighbours_count == 3 {
-                        // Any live cell with two or three live neighbours lives on to the next generation.
                     } else if live_neighbours_count > 3 {
-                        // Any live cell with more than three live neighbours dies, as if by overpopulation.
                         self.kill_cell(x as usize, y as usize);
                     }
                 } else {
-                    // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
                     if live_neighbours_count == 3 {
                         self.birth_cell(x as usize, y as usize);
                     }
