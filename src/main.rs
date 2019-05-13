@@ -52,6 +52,35 @@ struct World {
 }
 
 impl World {
+    fn new() -> Self {
+        let mut cells = vec![];
+
+        for _ in 0..HEIGHT {
+            let mut row = vec![];
+            for _ in 0..WIDTH {
+                row.push(Cell::default())
+            }
+            cells.push(row);
+        }
+        let world = Self { cells };
+
+        let seed = "- - - - -
+                    - - - # -
+                    - # - # -
+                    - - # # -
+                    - - - - -";
+
+        for (y, row) in seed.trim().split("\n").enumerate() {
+            for (x, cell) in row.trim().split(" ").enumerate() {
+                if cell == "#" {
+                    world.birth_cell(x, y);
+                }
+            }
+        }
+
+        world
+    }
+
     fn birth_cell(&mut self, x: usize, y: usize) {
         self.cells[y][x].alive = true
     }
@@ -114,22 +143,6 @@ impl World {
     }
 }
 
-impl Default for World {
-    fn default() -> Self {
-        let mut cells = vec![];
-
-        for _ in 0..HEIGHT {
-            let mut row = vec![];
-            for _ in 0..WIDTH {
-                row.push(Cell::default())
-            }
-            cells.push(row);
-        }
-
-        Self { cells }
-    }
-}
-
 impl std::fmt::Debug for World {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         write!(f, "\n")?;
@@ -149,21 +162,7 @@ const HEIGHT: u8 = 40;
 const WIDTH: u8 = 80;
 
 fn main() {
-    let mut world = World::default();
-
-    let seed = "- - - - -
-                - - - # -
-                - # - # -
-                - - # # -
-                - - - - -";
-
-    for (y, row) in seed.trim().split("\n").enumerate() {
-        for (x, cell) in row.trim().split(" ").enumerate() {
-            if cell == "#" {
-                world.birth_cell(x, y);
-            }
-        }
-    }
+    let mut world = World::new();
 
     let mut window = Window::new(
         "Game of Life",
