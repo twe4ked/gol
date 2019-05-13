@@ -60,8 +60,8 @@ impl World {
         }
         let mut world = Self {
             cells,
-            width: width,
-            height: height,
+            width,
+            height,
         };
 
         let seed = "- - - - -

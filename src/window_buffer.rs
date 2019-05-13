@@ -8,8 +8,8 @@ impl WindowBuffer {
     pub fn new(width: usize, height: usize) -> Self {
         Self {
             buffer: vec![0; width * height],
-            width: width,
-            height: height,
+            width,
+            height,
         }
     }
 
