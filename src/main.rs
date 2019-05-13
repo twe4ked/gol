@@ -11,7 +11,7 @@
 extern crate test;
 
 use gol::window_buffer::WindowBuffer;
-use minifb::{Key, Scale, Window, WindowOptions};
+use minifb::{Scale, Window, WindowOptions};
 
 #[rustfmt::skip]
 const OFFSETS: [(i8, i8); 8] = [
@@ -165,7 +165,7 @@ fn main() {
     });
     let mut window_buffer = WindowBuffer::new(world.width as usize, world.height as usize);
 
-    while window.is_open() && !window.is_key_down(Key::Escape) {
+    while window.is_open() {
         draw_world(&world, &mut window_buffer);
         window.update_with_buffer(&window_buffer.buffer).unwrap();
 
