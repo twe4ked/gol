@@ -13,6 +13,9 @@
 //!   #  #
 //!    # #
 
+use gol::window_buffer::WindowBuffer;
+use minifb::{Key, Window, WindowOptions};
+
 #[rustfmt::skip]
 const OFFSETS: [(isize, isize); 8] = [
     (-1, -1), (-1, 0), (-1, 1),
@@ -162,15 +165,23 @@ fn main() {
         }
     }
 
-    let mut i = 0;
-    loop {
-        clear_screen();
-        draw_world(&world);
-        draw_info(i);
+    let mut window = Window::new(
+        "Game of Life",
+        WIDTH as usize,
+        HEIGHT as usize,
+        WindowOptions::default(),
+    )
+    .unwrap_or_else(|e| {
+        panic!("{}", e);
+    });
+
+    let mut window_buffer = WindowBuffer::new(WIDTH as usize, HEIGHT as usize);
+
+    while window.is_open() && !window.is_key_down(Key::Escape) {
+        draw_world(&world, &mut window_buffer);
+        window.update_with_buffer(&window_buffer.buffer).unwrap();
 
         world.simulate();
-
-        i += 1;
 
         use std::{thread, time};
         let d = time::Duration::from_millis(250);
@@ -178,22 +189,16 @@ fn main() {
     }
 }
 
-fn clear_screen() {
-    print!("\x1b[2J\x1b[1;1H");
-}
+fn draw_world(world: &World, window_buffer: &mut WindowBuffer) {
+    window_buffer.clear();
 
-fn draw_world(world: &World) {
-    for row in &world.cells {
-        for cell in row {
-            print!("{}", cell);
+    for (y, row) in world.cells.iter().enumerate() {
+        for (x, cell) in row.iter().enumerate() {
+            if cell.alive {
+                window_buffer.set_pixel(x, y, 0xff0000);
+            }
         }
-        println!();
     }
-}
-
-fn draw_info(i: usize) {
-    println!();
-    println!("Iterations: {}", i);
 }
 
 #[cfg(test)]
