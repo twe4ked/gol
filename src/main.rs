@@ -14,7 +14,7 @@
 //!    # #
 
 use gol::window_buffer::WindowBuffer;
-use minifb::{Key, Window, WindowOptions};
+use minifb::{Key, Scale, Window, WindowOptions};
 
 #[rustfmt::skip]
 const OFFSETS: [(i8, i8); 8] = [
@@ -49,8 +49,8 @@ impl std::fmt::Display for Cell {
 #[derive(Clone, PartialEq)]
 struct World {
     cells: Vec<Vec<Cell>>,
-    width: u8,
-    height: u8,
+    width: usize,
+    height: usize,
 }
 
 impl World {
@@ -66,8 +66,8 @@ impl World {
         }
         let mut world = Self {
             cells,
-            width: width as u8,
-            height: height as u8,
+            width: width,
+            height: height,
         };
 
         let seed = "- - - - -
@@ -95,11 +95,11 @@ impl World {
         self.cells[y][x].alive = false
     }
 
-    fn is_cell_alive(&self, x: u8, y: u8) -> bool {
+    fn is_cell_alive(&self, x: usize, y: usize) -> bool {
         self.cells[y as usize][x as usize].alive
     }
 
-    fn live_neighbours_count(&self, x: u8, y: u8) -> u8 {
+    fn live_neighbours_count(&self, x: usize, y: usize) -> u8 {
         let mut n = 0;
 
         for (x_offset, y_offset) in &OFFSETS {
@@ -138,7 +138,7 @@ impl World {
     }
 }
 
-fn add_offset(n: u8, offset: i8) -> Option<u8> {
+fn add_offset(n: usize, offset: i8) -> Option<usize> {
     let n = n as i16;
     let offset = offset as i16;
 
@@ -147,7 +147,7 @@ fn add_offset(n: u8, offset: i8) -> Option<u8> {
             if n < 0 {
                 None
             } else {
-                Some(n as u8)
+                Some(n as usize)
             }
         }
         None => None,
@@ -169,8 +169,8 @@ impl std::fmt::Debug for World {
     }
 }
 
-const HEIGHT: usize = 40;
-const WIDTH: usize = 80;
+const HEIGHT: usize = 300;
+const WIDTH: usize = 400;
 
 fn main() {
     let mut world = World::new(WIDTH, HEIGHT);
@@ -179,7 +179,10 @@ fn main() {
         "Game of Life",
         world.width as usize,
         world.height as usize,
-        WindowOptions::default(),
+        WindowOptions {
+            scale: Scale::X2,
+            ..WindowOptions::default()
+        },
     )
     .unwrap_or_else(|e| {
         panic!("{}", e);
