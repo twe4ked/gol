@@ -154,8 +154,11 @@ fn main() {
 
         let after = time::Instant::now();
         let simulate_duration = after - before;
-        let d = time::Duration::from_millis(250) - simulate_duration;
-        thread::sleep(d);
+        if let Some(d) = time::Duration::from_millis(250).checked_sub(simulate_duration) {
+            thread::sleep(d);
+        } else {
+            eprintln!("simulation too slow: {:?}", simulate_duration);
+        }
     }
 }
 
