@@ -21,6 +21,8 @@ const OFFSETS: [(i8, i8); 8] = [
     ( 1, -1), ( 1, 0), ( 1, 1),
 ];
 const DESIRED_SLEEP_TIME: time::Duration = time::Duration::from_millis(50);
+const HEIGHT: usize = 300;
+const WIDTH: usize = 400;
 
 type Cell = bool;
 
@@ -125,9 +127,6 @@ impl std::fmt::Debug for World {
         Ok(())
     }
 }
-
-const HEIGHT: usize = 300;
-const WIDTH: usize = 400;
 
 fn main() {
     let mut world = World::new(WIDTH, HEIGHT);
