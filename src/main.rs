@@ -146,14 +146,14 @@ fn add_offset(n: usize, offset: i8) -> Option<usize> {
 
 impl std::fmt::Debug for World {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        write!(f, "\n")?;
+        writeln!(f)?;
         for row in &self.cells {
             for cell in row {
                 write!(f, "{}", cell)?;
             }
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
-        write!(f, "\n")?;
+        writeln!(f)?;
 
         Ok(())
     }
