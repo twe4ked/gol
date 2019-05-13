@@ -147,7 +147,7 @@ fn main() {
 
     while window.is_open() {
         draw_world(&world, &mut window_buffer);
-        window.update_with_buffer(&window_buffer.buffer).unwrap();
+        window.update_with_buffer(&window_buffer.buffer).expect("unable to update window");
 
         let before = time::Instant::now();
         world.simulate();
