@@ -34,7 +34,9 @@ fn main() {
 
     while window.is_open() {
         draw_world(&world, &mut window_buffer);
-        window.update_with_buffer(&window_buffer.buffer).expect("unable to update window");
+        window
+            .update_with_buffer(&window_buffer.buffer)
+            .expect("unable to update window");
 
         let before = time::Instant::now();
         world.simulate();
@@ -44,7 +46,10 @@ fn main() {
         if let Some(d) = DESIRED_SLEEP_TIME.checked_sub(simulate_duration) {
             thread::sleep(d);
         } else {
-            eprintln!("simulation too slow: {:?} (desired: {:?})", simulate_duration, DESIRED_SLEEP_TIME);
+            eprintln!(
+                "simulation too slow: {:?} (desired: {:?})",
+                simulate_duration, DESIRED_SLEEP_TIME
+            );
         }
     }
 }
