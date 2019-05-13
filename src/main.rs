@@ -17,7 +17,7 @@ use gol::window_buffer::WindowBuffer;
 use minifb::{Key, Window, WindowOptions};
 
 #[rustfmt::skip]
-const OFFSETS: [(isize, isize); 8] = [
+const OFFSETS: [(i8, i8); 8] = [
     (-1, -1), (-1, 0), (-1, 1),
     ( 0, -1),/* 0  0 */( 0, 1),
     ( 1, -1), ( 1, 0), ( 1, 1),
@@ -100,17 +100,14 @@ impl World {
     }
 
     fn live_neighbours_count(&self, x: u8, y: u8) -> u8 {
-        let x = x as isize;
-        let y = y as isize;
         let mut n = 0;
 
         for (x_offset, y_offset) in &OFFSETS {
-            let xx = x + x_offset;
-            let yy = y + y_offset;
-
-            if xx >= 0 && yy >= 0 && xx < self.width as isize && yy < self.height as isize {
-                if self.is_cell_alive(xx as u8, yy as u8) {
-                    n += 1
+            if let Some(x) = add_offset(x, *x_offset) {
+                if let Some(y) = add_offset(y, *y_offset) {
+                    if self.is_cell_alive(x, y) {
+                        n += 1
+                    }
                 }
             }
         }
@@ -138,6 +135,22 @@ impl World {
                 }
             }
         }
+    }
+}
+
+fn add_offset(n: u8, offset: i8) -> Option<u8> {
+    let n = n as i16;
+    let offset = offset as i16;
+
+    match n.checked_add(offset) {
+        Some(n) => {
+            if n < 0 {
+                None
+            } else {
+                Some(n as u8)
+            }
+        }
+        None => None,
     }
 }
 
