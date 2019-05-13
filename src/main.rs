@@ -70,8 +70,8 @@ impl World {
                     - - # # -
                     - - - - -";
 
-        for (y, row) in seed.trim().split("\n").enumerate() {
-            for (x, cell) in row.trim().split(" ").enumerate() {
+        for (y, row) in seed.trim().split('\n').enumerate() {
+            for (x, cell) in row.trim().split(' ').enumerate() {
                 if cell == "#" {
                     world.birth_cell(x, y);
                 }
