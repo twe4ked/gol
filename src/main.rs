@@ -21,16 +21,7 @@ const OFFSETS: [(i8, i8); 8] = [
     ( 1, -1), ( 1, 0), ( 1, 1),
 ];
 
-#[derive(Clone, PartialEq)]
-struct Cell {
-    alive: bool,
-}
-
-impl Default for Cell {
-    fn default() -> Self {
-        Self { alive: false }
-    }
-}
+type Cell = bool;
 
 #[derive(Clone, PartialEq)]
 struct World {
@@ -41,7 +32,7 @@ struct World {
 
 impl World {
     fn new(width: usize, height: usize) -> Self {
-        let cells = vec![vec![Cell::default(); width]; height];
+        let cells = vec![vec![false; width]; height];
         let mut world = Self {
             cells,
             width,
@@ -66,15 +57,15 @@ impl World {
     }
 
     fn birth_cell(&mut self, x: usize, y: usize) {
-        self.cells[y][x].alive = true
+        self.cells[y][x] = true
     }
 
     fn kill_cell(&mut self, x: usize, y: usize) {
-        self.cells[y][x].alive = false
+        self.cells[y][x] = false
     }
 
     fn is_cell_alive(&self, x: usize, y: usize) -> bool {
-        self.cells[y as usize][x as usize].alive
+        self.cells[y as usize][x as usize]
     }
 
     fn live_neighbours_count(&self, x: usize, y: usize) -> u8 {
@@ -173,7 +164,7 @@ fn draw_world(world: &World, window_buffer: &mut WindowBuffer) {
 
     for (y, row) in world.cells.iter().enumerate() {
         for (x, cell) in row.iter().enumerate() {
-            if cell.alive {
+            if *cell {
                 window_buffer.set_pixel(x, y, 0xff0000);
             }
         }
@@ -188,9 +179,9 @@ mod tests {
     #[test]
     fn test_live_neighbours_count() {
         let cells = vec![
-            vec![Cell::default(), Cell::default(), Cell::default()],
-            vec![Cell::default(), Cell::default(), Cell::default()],
-            vec![Cell::default(), Cell::default(), Cell::default()],
+            vec![false, false, false],
+            vec![false, false, false],
+            vec![false, false, false],
         ];
         let mut world = World {
             cells,
@@ -214,30 +205,10 @@ mod tests {
     #[test]
     fn test_block() {
         let cells = vec![
-            vec![
-                Cell::default(),
-                Cell::default(),
-                Cell::default(),
-                Cell::default(),
-            ],
-            vec![
-                Cell::default(),
-                Cell::default(),
-                Cell::default(),
-                Cell::default(),
-            ],
-            vec![
-                Cell::default(),
-                Cell::default(),
-                Cell::default(),
-                Cell::default(),
-            ],
-            vec![
-                Cell::default(),
-                Cell::default(),
-                Cell::default(),
-                Cell::default(),
-            ],
+            vec![false, false, false, false],
+            vec![false, false, false, false],
+            vec![false, false, false, false],
+            vec![false, false, false, false],
         ];
 
         let mut world = World {
