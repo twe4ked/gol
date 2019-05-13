@@ -12,6 +12,7 @@ extern crate test;
 
 use gol::window_buffer::WindowBuffer;
 use minifb::{Scale, Window, WindowOptions};
+use std::{thread, time};
 
 #[rustfmt::skip]
 const OFFSETS: [(i8, i8); 8] = [
@@ -169,10 +170,12 @@ fn main() {
         draw_world(&world, &mut window_buffer);
         window.update_with_buffer(&window_buffer.buffer).unwrap();
 
+        let before = time::Instant::now();
         world.simulate();
 
-        use std::{thread, time};
-        let d = time::Duration::from_millis(250);
+        let after = time::Instant::now();
+        let simulate_duration = after - before;
+        let d = time::Duration::from_millis(250) - simulate_duration;
         thread::sleep(d);
     }
 }
