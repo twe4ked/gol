@@ -129,18 +129,9 @@ impl World {
 }
 
 fn add_offset(n: usize, offset: i8) -> Option<usize> {
-    let n = n as i16;
-    let offset = i16::from(offset);
-
-    match n.checked_add(offset) {
-        Some(n) => {
-            if n < 0 {
-                None
-            } else {
-                Some(n as usize)
-            }
-        }
-        None => None,
+    match (n as i16).checked_add(i16::from(offset)) {
+        Some(n) if n >= 0 => Some(n as usize),
+        _ => None,
     }
 }
 
