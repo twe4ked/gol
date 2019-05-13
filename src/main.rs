@@ -49,20 +49,26 @@ impl std::fmt::Display for Cell {
 #[derive(Clone, PartialEq)]
 struct World {
     cells: Vec<Vec<Cell>>,
+    width: u8,
+    height: u8,
 }
 
 impl World {
-    fn new() -> Self {
+    fn new(width: usize, height: usize) -> Self {
         let mut cells = vec![];
 
-        for _ in 0..HEIGHT {
+        for _ in 0..height {
             let mut row = vec![];
-            for _ in 0..WIDTH {
+            for _ in 0..width {
                 row.push(Cell::default())
             }
             cells.push(row);
         }
-        let world = Self { cells };
+        let mut world = Self {
+            cells,
+            width: width as u8,
+            height: height as u8,
+        };
 
         let seed = "- - - - -
                     - - - # -
@@ -102,7 +108,7 @@ impl World {
             let xx = x + x_offset;
             let yy = y + y_offset;
 
-            if xx >= 0 && yy >= 0 && xx < self.width() as isize && yy < self.height() as isize {
+            if xx >= 0 && yy >= 0 && xx < self.width as isize && yy < self.height as isize {
                 if self.is_cell_alive(xx as u8, yy as u8) {
                     n += 1
                 }
@@ -115,8 +121,8 @@ impl World {
     fn simulate(&mut self) {
         let old_world = self.clone();
 
-        for y in 0..self.height() {
-            for x in 0..self.width() {
+        for y in 0..(self.height - 1) {
+            for x in 0..(self.width - 1) {
                 let live_neighbours_count = old_world.live_neighbours_count(x, y);
 
                 if old_world.is_cell_alive(x, y) {
@@ -132,14 +138,6 @@ impl World {
                 }
             }
         }
-    }
-
-    fn height(&self) -> u8 {
-        self.cells.len() as u8
-    }
-
-    fn width(&self) -> u8 {
-        self.cells[0].len() as u8
     }
 }
 
@@ -158,23 +156,22 @@ impl std::fmt::Debug for World {
     }
 }
 
-const HEIGHT: u8 = 40;
-const WIDTH: u8 = 80;
+const HEIGHT: usize = 40;
+const WIDTH: usize = 80;
 
 fn main() {
-    let mut world = World::new();
+    let mut world = World::new(WIDTH, HEIGHT);
 
     let mut window = Window::new(
         "Game of Life",
-        WIDTH as usize,
-        HEIGHT as usize,
+        world.width as usize,
+        world.height as usize,
         WindowOptions::default(),
     )
     .unwrap_or_else(|e| {
         panic!("{}", e);
     });
-
-    let mut window_buffer = WindowBuffer::new(WIDTH as usize, HEIGHT as usize);
+    let mut window_buffer = WindowBuffer::new(world.width as usize, world.height as usize);
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
         draw_world(&world, &mut window_buffer);
@@ -211,7 +208,11 @@ mod tests {
             vec![Cell::default(), Cell::default(), Cell::default()],
             vec![Cell::default(), Cell::default(), Cell::default()],
         ];
-        let mut world = World { cells };
+        let mut world = World {
+            cells,
+            width: 3,
+            height: 3,
+        };
 
         assert_eq!(world.live_neighbours_count(1, 1), 0);
 
@@ -255,7 +256,11 @@ mod tests {
             ],
         ];
 
-        let mut world = World { cells };
+        let mut world = World {
+            cells,
+            width: 4,
+            height: 4,
+        };
 
         world.birth_cell(1, 1);
         world.birth_cell(1, 2);
