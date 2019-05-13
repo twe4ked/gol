@@ -32,18 +32,6 @@ impl Default for Cell {
     }
 }
 
-impl std::fmt::Display for Cell {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        if self.alive {
-            write!(f, "# ")?;
-        } else {
-            write!(f, "  ")?;
-        }
-
-        Ok(())
-    }
-}
-
 #[derive(Clone, PartialEq)]
 struct World {
     cells: Vec<Vec<Cell>>,
