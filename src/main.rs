@@ -7,6 +7,9 @@
 //!   Any live cell with more than three live neighbours dies, as if by overpopulation.
 //!   Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
+#![feature(test)]
+extern crate test;
+
 use gol::window_buffer::WindowBuffer;
 use minifb::{Key, Scale, Window, WindowOptions};
 
@@ -49,15 +52,7 @@ struct World {
 
 impl World {
     fn new(width: usize, height: usize) -> Self {
-        let mut cells = vec![];
-
-        for _ in 0..height {
-            let mut row = vec![];
-            for _ in 0..width {
-                row.push(Cell::default())
-            }
-            cells.push(row);
-        }
+        let cells = vec![vec![Cell::default(); width]; height];
         let mut world = Self {
             cells,
             width,
@@ -197,6 +192,7 @@ fn draw_world(world: &World, window_buffer: &mut WindowBuffer) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test::Bencher;
 
     #[test]
     fn test_live_neighbours_count() {
@@ -269,5 +265,12 @@ mod tests {
         world.simulate();
 
         assert_eq!(old_world, world);
+    }
+
+    #[bench]
+    fn bench_world_new(b: &mut Bencher) {
+        b.iter(|| {
+            World::new(100, 100);
+        });
     }
 }
