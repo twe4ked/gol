@@ -10,7 +10,7 @@
 #![feature(test)]
 extern crate test;
 
-use gol::{window_buffer::WindowBuffer, world::World};
+use gol::{WindowBuffer, World};
 use minifb::{Scale, Window, WindowOptions};
 use std::{thread, time};
 

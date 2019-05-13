@@ -1,2 +1,5 @@
-pub mod window_buffer;
-pub mod world;
+mod window_buffer;
+mod world;
+
+pub use window_buffer::WindowBuffer;
+pub use world::World;
