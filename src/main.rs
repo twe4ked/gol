@@ -7,9 +7,6 @@
 //!   Any live cell with more than three live neighbours dies, as if by overpopulation.
 //!   Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
-#![feature(test)]
-extern crate test;
-
 use gol::{WindowBuffer, World};
 use minifb::{Scale, Window, WindowOptions};
 use std::{thread, time};
