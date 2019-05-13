@@ -20,6 +20,7 @@ const OFFSETS: [(i8, i8); 8] = [
     ( 0, -1),/* 0  0 */( 0, 1),
     ( 1, -1), ( 1, 0), ( 1, 1),
 ];
+const DESIRED_SLEEP_TIME: time::Duration = time::Duration::from_millis(50);
 
 type Cell = bool;
 
@@ -154,10 +155,10 @@ fn main() {
 
         let after = time::Instant::now();
         let simulate_duration = after - before;
-        if let Some(d) = time::Duration::from_millis(50).checked_sub(simulate_duration) {
+        if let Some(d) = DESIRED_SLEEP_TIME.checked_sub(simulate_duration) {
             thread::sleep(d);
         } else {
-            eprintln!("simulation too slow: {:?}", simulate_duration);
+            eprintln!("simulation too slow: {:?} (desired: {:?})", simulate_duration, DESIRED_SLEEP_TIME);
         }
     }
 }
