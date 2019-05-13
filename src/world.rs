@@ -16,28 +16,21 @@ pub struct World {
 
 impl World {
     pub fn new(width: usize, height: usize) -> Self {
-        let cells = vec![vec![false; width]; height];
-        let mut world = Self {
-            cells,
+        Self {
+            cells: vec![vec![false; width]; height],
             width,
             height,
-        };
+        }
+    }
 
-        let seed = "- - - - -
-                    - - - # -
-                    - # - # -
-                    - - # # -
-                    - - - - -";
-
+    pub fn seed_from_string(&mut self, seed: String) {
         for (y, row) in seed.trim().split('\n').enumerate() {
             for (x, cell) in row.trim().split(' ').enumerate() {
                 if cell == "#" {
-                    world.birth_cell(x, y);
+                    self.birth_cell(x, y);
                 }
             }
         }
-
-        world
     }
 
     fn birth_cell(&mut self, x: usize, y: usize) {
