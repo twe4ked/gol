@@ -116,16 +116,12 @@ impl World {
             for x in 0..(self.width - 1) {
                 let live_neighbours_count = old_world.live_neighbours_count(x, y);
 
-                if old_world.is_cell_alive(x, y) {
-                    if live_neighbours_count < 2 {
-                        self.kill_cell(x as usize, y as usize);
-                    } else if live_neighbours_count > 3 {
-                        self.kill_cell(x as usize, y as usize);
-                    }
-                } else {
-                    if live_neighbours_count == 3 {
-                        self.birth_cell(x as usize, y as usize);
-                    }
+                if old_world.is_cell_alive(x, y)
+                    && (live_neighbours_count < 2 || live_neighbours_count > 3)
+                {
+                    self.kill_cell(x as usize, y as usize);
+                } else if live_neighbours_count == 3 {
+                    self.birth_cell(x as usize, y as usize);
                 }
             }
         }
