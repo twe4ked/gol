@@ -108,16 +108,7 @@ mod tests {
 
     #[test]
     fn test_live_neighbours_count() {
-        let cells = vec![
-            vec![false, false, false],
-            vec![false, false, false],
-            vec![false, false, false],
-        ];
-        let mut world = World {
-            cells,
-            width: 3,
-            height: 3,
-        };
+        let mut world = World::new(3, 3);
 
         assert_eq!(world.live_neighbours_count(1, 1), 0);
 
@@ -134,23 +125,15 @@ mod tests {
 
     #[test]
     fn test_block() {
-        let cells = vec![
-            vec![false, false, false, false],
-            vec![false, false, false, false],
-            vec![false, false, false, false],
-            vec![false, false, false, false],
-        ];
+        let mut world = World::new(4, 4);
 
-        let mut world = World {
-            cells,
-            width: 4,
-            height: 4,
-        };
-
-        world.birth_cell(1, 1);
-        world.birth_cell(1, 2);
-        world.birth_cell(2, 1);
-        world.birth_cell(2, 2);
+        world.seed_from_string(
+            "- - - -
+             - # # -
+             - # # -
+             - - - -"
+                .to_string(),
+        );
 
         let old_world = world.clone();
 
