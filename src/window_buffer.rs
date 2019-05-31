@@ -15,7 +15,7 @@ impl WindowBuffer {
 
     pub fn set_pixel(&mut self, x: usize, y: usize, color: u32) {
         let l = y * self.width + x;
-        assert!(l <= self.width * self.height - 2);
+        assert!(l <= self.width * self.height);
         self.buffer[l] = color;
     }
 
