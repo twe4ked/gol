@@ -68,12 +68,11 @@ impl World {
 
     fn for_each_neighbour<F: Fn(&mut World, usize, usize)>(&mut self, x: usize, y: usize, f: F) {
         for (x_offset, y_offset) in &OFFSETS {
-            if let Some(x) = add_offset(x, *x_offset) {
-                if let Some(y) = add_offset(y, *y_offset) {
-                    if x < self.width && y < self.height {
-                        f(self, x, y);
-                    }
-                }
+            let x = add_offset(x, *x_offset);
+            let y = add_offset(y, *y_offset);
+
+            if x < self.width && y < self.height {
+                f(self, x, y);
             }
         }
     }
@@ -96,11 +95,8 @@ impl World {
     }
 }
 
-fn add_offset(n: usize, offset: i8) -> Option<usize> {
-    match (n as i16).checked_add(i16::from(offset)) {
-        Some(n) if n >= 0 => Some(n as usize),
-        _ => None,
-    }
+fn add_offset(n: usize, offset: i8) -> usize {
+    ((n as isize).saturating_add(isize::from(offset))) as usize
 }
 
 impl std::fmt::Debug for World {
