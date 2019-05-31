@@ -16,6 +16,13 @@ mod tests {
     #[bench]
     fn bench_simulate(b: &mut Bencher) {
         let mut world = World::new(100, 100);
+        world.seed_from_string(
+            "- - - -
+             - # # -
+             - # # -
+             - - - -"
+                .to_string(),
+        );
 
         b.iter(|| {
             world.simulate();
