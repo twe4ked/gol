@@ -68,7 +68,7 @@ fn draw_world(world: &World, window_buffer: &mut WindowBuffer) {
 
     for (y, row) in world.cells.iter().enumerate() {
         for (x, cell) in row.iter().enumerate() {
-            if *cell {
+            if cell.alive {
                 window_buffer.set_pixel(x, y, 0xff0000);
             }
         }

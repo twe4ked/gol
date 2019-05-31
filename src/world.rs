@@ -5,7 +5,20 @@ const OFFSETS: [(i8, i8); 8] = [
     ( 1, -1), ( 1, 0), ( 1, 1),
 ];
 
-type Cell = bool;
+#[derive(Clone, Debug, PartialEq)]
+pub struct Cell {
+    pub alive: bool,
+    live_neighbours_count: u8,
+}
+
+impl Cell {
+    pub fn new() -> Self {
+        Cell {
+            alive: false,
+            live_neighbours_count: 0,
+        }
+    }
+}
 
 #[derive(Clone, PartialEq)]
 pub struct World {
@@ -17,7 +30,7 @@ pub struct World {
 impl World {
     pub fn new(width: usize, height: usize) -> Self {
         Self {
-            cells: vec![vec![false; width]; height],
+            cells: vec![vec![Cell::new(); width]; height],
             width,
             height,
         }
@@ -33,32 +46,36 @@ impl World {
         }
     }
 
+    fn cell(&self, x: usize, y: usize) -> &Cell {
+        &self.cells[y][x]
+    }
+
     fn birth_cell(&mut self, x: usize, y: usize) {
-        self.cells[y][x] = true
+        self.cells[y][x].alive = true;
+
+        self.for_each_neighbour(x, y, |world, x, y| {
+            world.cells[y][x].live_neighbours_count += 1
+        });
     }
 
     fn kill_cell(&mut self, x: usize, y: usize) {
-        self.cells[y][x] = false
+        self.cells[y][x].alive = false;
+
+        self.for_each_neighbour(x, y, |world, x, y| {
+            world.cells[y][x].live_neighbours_count -= 1
+        });
     }
 
-    fn is_cell_alive(&self, x: usize, y: usize) -> bool {
-        self.cells[y as usize][x as usize]
-    }
-
-    fn live_neighbours_count(&self, x: usize, y: usize) -> u8 {
-        let mut n = 0;
-
+    fn for_each_neighbour<F: Fn(&mut World, usize, usize)>(&mut self, x: usize, y: usize, f: F) {
         for (x_offset, y_offset) in &OFFSETS {
             if let Some(x) = add_offset(x, *x_offset) {
                 if let Some(y) = add_offset(y, *y_offset) {
-                    if self.is_cell_alive(x, y) {
-                        n += 1
+                    if x < self.width && y < self.height {
+                        f(self, x, y);
                     }
                 }
             }
         }
-
-        n
     }
 
     pub fn simulate(&mut self) {
@@ -66,13 +83,12 @@ impl World {
 
         for y in 0..(self.height - 1) {
             for x in 0..(self.width - 1) {
-                let live_neighbours_count = old_world.live_neighbours_count(x, y);
+                let cell = old_world.cell(x, y);
 
-                if old_world.is_cell_alive(x, y)
-                    && (live_neighbours_count < 2 || live_neighbours_count > 3)
+                if cell.alive && (cell.live_neighbours_count < 2 || cell.live_neighbours_count > 3)
                 {
                     self.kill_cell(x as usize, y as usize);
-                } else if live_neighbours_count == 3 {
+                } else if !cell.alive && cell.live_neighbours_count == 3 {
                     self.birth_cell(x as usize, y as usize);
                 }
             }
@@ -92,11 +108,14 @@ impl std::fmt::Debug for World {
         writeln!(f)?;
         for row in &self.cells {
             for cell in row {
-                write!(f, "{}", cell)?;
+                if cell.alive {
+                    write!(f, "# ")?;
+                } else {
+                    write!(f, "- ")?;
+                }
             }
             writeln!(f)?;
         }
-        writeln!(f)?;
 
         Ok(())
     }
@@ -110,7 +129,7 @@ mod tests {
     fn test_live_neighbours_count() {
         let mut world = World::new(3, 3);
 
-        assert_eq!(world.live_neighbours_count(1, 1), 0);
+        assert_eq!(world.cell(1, 1).live_neighbours_count, 0);
 
         let mut i = 0;
         for (x_offset, y_offset) in &OFFSETS {
@@ -119,7 +138,7 @@ mod tests {
 
             i += 1;
             world.birth_cell(x as usize, y as usize);
-            assert_eq!(world.live_neighbours_count(1, 1), i);
+            assert_eq!(world.cell(1, 1).live_neighbours_count, i);
         }
     }
 
