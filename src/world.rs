@@ -1,3 +1,5 @@
+use rand::{thread_rng, Rng};
+
 #[rustfmt::skip]
 const OFFSETS: [(i8, i8); 8] = [
     (-1, -1), (-1, 0), (-1, 1),
@@ -41,6 +43,18 @@ impl World {
             for (x, cell) in row.trim().split(' ').enumerate() {
                 if cell == "#" {
                     self.birth_cell(x, y);
+                }
+            }
+        }
+    }
+
+    pub fn seed_random(&mut self) {
+        let mut rng = thread_rng();
+
+        for y in 0..(self.height - 1) {
+            for x in 0..(self.width - 1) {
+                if rng.gen_bool(0.5) {
+                    self.birth_cell(x as usize, y as usize);
                 }
             }
         }

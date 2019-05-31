@@ -18,14 +18,7 @@ const WIDTH: usize = 400;
 fn main() {
     let mut world = World::new(WIDTH, HEIGHT);
 
-    world.seed_from_string(
-        "- - - - -
-         - - - # -
-         - # - # -
-         - - # # -
-         - - - - -"
-            .to_string(),
-    );
+    world.seed_random();
 
     let mut window = Window::new(
         "Game of Life",
