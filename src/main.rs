@@ -7,8 +7,11 @@
 //!   Any live cell with more than three live neighbours dies, as if by overpopulation.
 //!   Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
+use clap::{App, Arg};
 use gol::{WindowBuffer, World};
 use minifb::{Scale, Window, WindowOptions};
+use std::fs::File;
+use std::io::prelude::*;
 use std::{thread, time};
 
 const DESIRED_SLEEP_TIME: time::Duration = time::Duration::from_millis(50);
@@ -16,9 +19,30 @@ const HEIGHT: usize = 300;
 const WIDTH: usize = 400;
 
 fn main() {
+    let matches = App::new("Game of Life")
+        .version("0.1.0")
+        .author("Odin Dutton <odindutton@gmail.com>")
+        .arg(
+            Arg::with_name("seed")
+                .short("s")
+                .long("seed")
+                .value_name("FILE")
+                .help("Sets a custom seed file")
+                .takes_value(true),
+        )
+        .get_matches();
+
     let mut world = World::new(WIDTH, HEIGHT);
 
-    world.seed_random();
+    if let Some(seed) = matches.value_of("seed") {
+        let mut file = File::open(seed).expect("unable to open file");
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)
+            .expect("unable to read file");
+        world.seed_from_string(contents);
+    } else {
+        world.seed_random();
+    }
 
     let mut window = Window::new(
         "Game of Life",
