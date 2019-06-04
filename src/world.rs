@@ -1,3 +1,4 @@
+use bobbin_bits::U4;
 use rand::{thread_rng, Rng};
 
 #[rustfmt::skip]
@@ -10,15 +11,23 @@ const OFFSETS: [(i8, i8); 8] = [
 #[derive(Clone, Debug, PartialEq)]
 pub struct Cell {
     pub alive: bool,
-    live_neighbours_count: u8,
+    live_neighbours_count: U4,
 }
 
 impl Cell {
     pub fn new() -> Self {
         Cell {
             alive: false,
-            live_neighbours_count: 0,
+            live_neighbours_count: U4::B0000,
         }
+    }
+
+    fn increment_live_neighbours_count(&mut self) {
+        self.live_neighbours_count = (self.live_neighbours_count.value() + 1).into();
+    }
+
+    fn decrement_live_neighbours_count(&mut self) {
+        self.live_neighbours_count = (self.live_neighbours_count.value() - 1).into();
     }
 }
 
@@ -68,7 +77,7 @@ impl World {
         self.cells[y][x].alive = true;
 
         self.for_each_neighbour(x, y, |world, x, y| {
-            world.cells[y][x].live_neighbours_count += 1
+            world.cells[y][x].increment_live_neighbours_count()
         });
     }
 
@@ -76,7 +85,7 @@ impl World {
         self.cells[y][x].alive = false;
 
         self.for_each_neighbour(x, y, |world, x, y| {
-            world.cells[y][x].live_neighbours_count -= 1
+            world.cells[y][x].decrement_live_neighbours_count()
         });
     }
 
@@ -98,10 +107,12 @@ impl World {
             for x in 0..(self.width - 1) {
                 let cell = old_world.cell(x, y);
 
-                if cell.alive && (cell.live_neighbours_count < 2 || cell.live_neighbours_count > 3)
+                if cell.alive
+                    && (cell.live_neighbours_count.value() < 2
+                        || cell.live_neighbours_count.value() > 3)
                 {
                     self.kill_cell(x as usize, y as usize);
-                } else if !cell.alive && cell.live_neighbours_count == 3 {
+                } else if !cell.alive && cell.live_neighbours_count.value() == 3 {
                     self.birth_cell(x as usize, y as usize);
                 }
             }
