@@ -80,6 +80,14 @@ impl World {
         });
     }
 
+    pub fn toggle_cell(&mut self, x: usize, y: usize) {
+        if self.cell(x, y).alive {
+            self.kill_cell(x, y);
+        } else {
+            self.birth_cell(x, y);
+        }
+    }
+
     fn for_each_neighbour<F: Fn(&mut World, usize, usize)>(&mut self, x: usize, y: usize, f: F) {
         for (x_offset, y_offset) in &OFFSETS {
             let x = add_offset(x, *x_offset);

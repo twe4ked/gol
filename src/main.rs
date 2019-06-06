@@ -9,8 +9,9 @@
 
 use clap::{App, Arg};
 use gol::{WindowBuffer, World};
-use minifb::{Scale, Window, WindowOptions};
+use minifb::{MouseButton, MouseMode, Scale, Window, WindowOptions};
 use rand::{thread_rng, Rng};
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::prelude::*;
 use std::{thread, time};
@@ -64,16 +65,39 @@ fn main() {
         panic!("{}", e);
     });
     let mut window_buffer = WindowBuffer::new(world.width as usize, world.height as usize);
+    let mut mouse_down = false;
+    let mut cells_to_toggle: HashSet<(usize, usize)> = HashSet::new();
 
     while window.is_open() {
         draw_world(
             &world,
             &mut window_buffer,
+            &cells_to_toggle,
             matches.is_present("random_color"),
         );
         window
             .update_with_buffer(&window_buffer.buffer)
             .expect("unable to update window");
+
+        window.get_mouse_pos(MouseMode::Discard).map(|(x, y)| {
+            let x = x as usize;
+            let y = y as usize;
+
+            if window.get_mouse_down(MouseButton::Left) {
+                if !mouse_down {
+                    mouse_down = true;
+                }
+
+                cells_to_toggle.insert((x, y));
+            } else if mouse_down {
+                mouse_down = false;
+
+                for (x, y) in &cells_to_toggle {
+                    world.toggle_cell(*x, *y);
+                }
+                cells_to_toggle.clear();;
+            }
+        });
 
         let before = time::Instant::now();
         world.simulate();
@@ -91,7 +115,12 @@ fn main() {
     }
 }
 
-fn draw_world(world: &World, window_buffer: &mut WindowBuffer, random_color: bool) {
+fn draw_world(
+    world: &World,
+    window_buffer: &mut WindowBuffer,
+    cells_to_toggle: &HashSet<(usize, usize)>,
+    random_color: bool,
+) {
     window_buffer.clear();
     let mut rng = thread_rng();
 
@@ -106,5 +135,9 @@ fn draw_world(world: &World, window_buffer: &mut WindowBuffer, random_color: boo
                 window_buffer.set_pixel(x, y, color);
             }
         }
+    }
+
+    for (x, y) in cells_to_toggle {
+        window_buffer.set_pixel(*x, *y, 0xffffff);
     }
 }
