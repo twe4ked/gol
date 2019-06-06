@@ -10,6 +10,7 @@
 use clap::{App, Arg};
 use gol::{WindowBuffer, World};
 use minifb::{Scale, Window, WindowOptions};
+use rand::{thread_rng, Rng};
 use std::fs::File;
 use std::io::prelude::*;
 use std::{thread, time};
@@ -29,6 +30,12 @@ fn main() {
                 .value_name("FILE")
                 .help("Sets a custom seed file")
                 .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("random_color")
+                .short("r")
+                .long("random-color")
+                .help("Turns on random colors"),
         )
         .get_matches();
 
@@ -59,7 +66,11 @@ fn main() {
     let mut window_buffer = WindowBuffer::new(world.width as usize, world.height as usize);
 
     while window.is_open() {
-        draw_world(&world, &mut window_buffer);
+        draw_world(
+            &world,
+            &mut window_buffer,
+            matches.is_present("random_color"),
+        );
         window
             .update_with_buffer(&window_buffer.buffer)
             .expect("unable to update window");
@@ -80,13 +91,19 @@ fn main() {
     }
 }
 
-fn draw_world(world: &World, window_buffer: &mut WindowBuffer) {
+fn draw_world(world: &World, window_buffer: &mut WindowBuffer, random_color: bool) {
     window_buffer.clear();
+    let mut rng = thread_rng();
 
     for (y, row) in world.cells.iter().enumerate() {
         for (x, cell) in row.iter().enumerate() {
             if cell.alive {
-                window_buffer.set_pixel(x, y, 0xff0000);
+                let color = if random_color {
+                    rng.gen::<u32>()
+                } else {
+                    0xff0000
+                };
+                window_buffer.set_pixel(x, y, color);
             }
         }
     }
