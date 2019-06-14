@@ -17,8 +17,8 @@ use std::io::prelude::*;
 use std::{thread, time};
 
 const DESIRED_SLEEP_TIME: time::Duration = time::Duration::from_millis(50);
-const HEIGHT: usize = 300;
-const WIDTH: usize = 400;
+const HEIGHT: usize = 30;
+const WIDTH: usize = 40;
 
 fn main() {
     let matches = App::new("Game of Life")
